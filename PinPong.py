@@ -2,9 +2,9 @@
 from pygame import *
 class GameSprite(sprite.Sprite):
     # конструктор класса
-    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
+    def __init__(self, player_image, player_x, player_y,player_speed, size_x, size_y ):
         # Вызываем конструктор класса (Sprite):
-        sprite.Sprite.__init__(self)
+        super().__init__()
 
         # каждый спрайт должен хранить свойство image - изображение
         self.image = transform.scale(image.load(player_image), (size_x, size_y))
@@ -30,9 +30,9 @@ class Player(GameSprite):
 
     def update_l(self):
         keys = key.get_pressed()
-        if keys[K_UP] and self.rect.y > 5:
+        if keys[K_w] and self.rect.y > 5:
             self.rect.y -= self.speed
-        if keys[K_DOWN] and self.rect.y < win_height - 80:
+        if keys[K_s] and self.rect.y < win_height - 80:
             self.rect.y += self.speed
 
 
@@ -61,3 +61,53 @@ font.init()
 font = font.Font(None,35)
 lose1 = font.render('PLAYER 1 LOSE!', True, (180, 0, 0))
 lose2 = font.render('PLAYER 2 LOSE!', True, (180, 0, 0))
+
+speed_x = 3
+speed_y = 3
+
+while game:
+    # событие нажатия на кнопку Закрыть
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
+
+    if finish != True:
+        window.fill(back)
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+
+        racket1.update_l()
+        racket2.update_r()
+
+        if ball.rect.y > win_height-50 or ball.rect.y < 0:
+            speed_y *= -1
+
+        if sprite.collide_rect(racket1, ball) or sprite.collide_rect(racket2, ball):
+            speed_x *= -1
+
+        if ball.rect.x < 0:
+            finish = True
+            window.blit(lose1,(200,200))
+
+        if ball.rect.x > win_width:
+            finish = True
+            window.blit(lose2,(200,200))
+
+        racket1.reset()
+        racket2.reset()
+        ball.reset()
+
+    display.update()
+    clock.tick(FPS)
+
+
+
+
+
+
+
+
+
+
+
+
